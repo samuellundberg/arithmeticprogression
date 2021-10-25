@@ -1,12 +1,13 @@
 import numpy as np
 from numpy import random as rd
 import itertools as it
+from matplotlib import pyplot as plt
 
 
 # select every possible point in a line without making an arithmetic progression
 # this is the greedy selection, will not be great for bigger lines
 def greedy(n):
-    l = np.zeros(n, dtype=int)
+    l = np.zeros((n, 1), dtype=int)
     indexes = []
 
     for p in range(n):
@@ -25,9 +26,31 @@ def greedy(n):
 
 # greedy but start in middle
 def mid_greedy(n):
-    l = np.zeros(n, dtype=int)
+    l = np.zeros((n, 1), dtype=int)
     indexes = []
     for x in range(n):
+        if x % 2:
+            p = int(n/2) - 1 - int(x/2)
+        else:
+            p = int(n/2) + int(x/2)
+        select = True
+        for p0 in indexes:
+            dist = p - p0
+            if p + dist in indexes or p0 - dist in indexes:
+                select = False
+                continue
+
+        if select:
+            l[p] = 1
+            indexes.append(p)
+    return l
+
+# greedy but start in the ends
+def side_greedy(n):
+    l = np.zeros((n, 1), dtype=int)
+    indexes = []
+    for y in range(n):
+        x = n - y - 1
         if x % 2:
             p = int(n/2) - 1 - int(x/2)
         else:
@@ -113,13 +136,18 @@ num = 27
 
 # algo = 'perfect16'
 
-line = greedy(num)
+line = side_greedy(num)
 line2 = mid_greedy(num)
-line3, r = often_greedy(num)
-line4 = perm_greedy(num)
+#line3, r = often_greedy(num)
+#line4 = perm_greedy(num)
 
-print('greedy = ', counter(line))
-print('perm_greedy = ', counter(line4))
-print('often_greedy = ', counter(line3))
+print('side_greedy = ', counter(line))
+#print('perm_greedy = ', counter(line4))
+#print('often_greedy = ', counter(line3))
 print('mid_greedy = ', counter(line2))
 
+plt.imshow(line.T)
+plt.show()
+
+plt.imshow(line2.T)
+plt.show()
