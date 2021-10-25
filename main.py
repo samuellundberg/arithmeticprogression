@@ -61,6 +61,92 @@ def greedy(set, m_shape):
     return grid, selected
 
 
+# Greedy algo, selects a grid if possible, but looking starting from the middle of the set
+# Does not work very well
+def in_greedy(set, m_shape):
+    grid = np.zeros(m_shape, dtype=int)
+    selected = []
+
+    l = len(set)
+    for x in range(l):
+        select = True
+
+        if x % 2:
+            i = int(l / 2) - 1 - int(x / 2)
+        else:
+            i = int(l / 2) + int(x / 2)
+
+        p = set[i]
+        for p0 in selected:
+            p_0 = p[0]
+            p_1 = p[1]
+            p0_0 = p0[0]
+            p0_1 = p0[1]
+            dist_x = p_0 - p0_0
+            dist_y = p_1 - p0_1
+            if (p_0 + dist_x, p_1 + dist_y) in selected:
+                select = False
+                break
+            elif (p_0 + dist_x, p0_1 - dist_y) in selected:
+                select = False
+                break
+            elif (p0_0 - dist_x, p_1 + dist_y) in selected:
+                select = False
+                break
+            elif (p0_0 - dist_x, p0_1 - dist_y) in selected:
+                select = False
+                break
+        if select:
+            grid[p[0], p[1]] = 1
+            selected.append(p)
+
+    return grid, selected
+
+
+# Greedy algo, selects a grid if possible, but looking from the outsides of the set and working inwards
+# Better than greedy for most sizes
+# The problem is that it starts bottom right and top left. It does not know of the grids geometry
+def out_greedy(set, m_shape):
+    grid = np.zeros(m_shape, dtype=int)
+    selected = []
+
+    l = len(set)
+    for y in range(l):
+        select = True
+
+        x = l - y - 1
+        if x % 2:
+            i = int(l / 2) - 1 - int(x / 2)
+        else:
+            i = int(l / 2) + int(x / 2)
+
+        p = set[i]
+        for p0 in selected:
+            p_0 = p[0]
+            p_1 = p[1]
+            p0_0 = p0[0]
+            p0_1 = p0[1]
+            dist_x = p_0 - p0_0
+            dist_y = p_1 - p0_1
+            if (p_0 + dist_x, p_1 + dist_y) in selected:
+                select = False
+                break
+            elif (p_0 + dist_x, p0_1 - dist_y) in selected:
+                select = False
+                break
+            elif (p0_0 - dist_x, p_1 + dist_y) in selected:
+                select = False
+                break
+            elif (p0_0 - dist_x, p0_1 - dist_y) in selected:
+                select = False
+                break
+        if select:
+            grid[p[0], p[1]] = 1
+            selected.append(p)
+
+    return grid, selected
+
+
 # count the selected cells
 def counter(sets):
     return len(sets)
@@ -99,11 +185,11 @@ def store_results(size, result_string, score):
 
         if len(content) == 2:
             ref = int(content[0])
-            if score < ref:
+            if score > ref:
                 print('found new best score of: ', score, ' for size: ', size)
                 my_write(path, result_string, score)
             else:
-                print('did not beat old solution of: ', ref, ' for size: ', size)
+                print('found', score, 'cells, did not beat old solution of:', ref, 'for size:', size)
         else:
             print('Weird file at path: ', path)
     except IOError:
@@ -112,14 +198,14 @@ def store_results(size, result_string, score):
 
 
 def formatter(cells, n, mat):
-    print('cells: ', cells)
+    # print('cells: ', cells)
 
     n_cells = []
     for c in cells:
         idx = sum(mat[c[0], :c[1]])
         n_cells.append((c[0], idx))
 
-    print('new_cells: ', n_cells)
+    # print('new_cells: ', n_cells)
 
     d = {}
     for c in n_cells:
@@ -127,7 +213,7 @@ def formatter(cells, n, mat):
             d[c[0]].append(c[1])
         else:
             d[c[0]] = [c[1]]
-    print('d: ', d)
+    # print('d: ', d)
 
     l = []
     for i in range(2 * n - 1):
@@ -141,14 +227,23 @@ def formatter(cells, n, mat):
     return l
 
 
-def main(n):
+def main(n, algo):
     m, s = build_matrix(n)
 
     m_shape = m.shape
-    grid, cells = greedy(s, m_shape)
 
-    plt.imshow(m+grid)
-    plt.show()
+    if algo == 'greedy':
+        grid, cells = greedy(s, m_shape)
+    elif algo == 'in_greedy':
+        grid, cells = in_greedy(s, m_shape)
+    elif algo == 'out_greedy':
+        grid, cells = out_greedy(s, m_shape)
+    else:
+        print(algo, 'is not an available algorithm, exiting.')
+        exit()
+
+    # plt.imshow(m+grid)
+    # plt.show()
 
     score = counter(cells)
     formatted_cells = formatter(cells, num, m)
@@ -159,10 +254,11 @@ def main(n):
 N = [11]
 # N = [2, 6, 11, 18, 27, 38]
 # N = [2, 6, 11, 18, 27, 38, 50, 65, 81, 98, 118, 139, 162, 187, 214, 242, 273, 305, 338, 374, 411, 450, 491, 534, 578]
+algo = 'out_greedy'
 
 t0 = time.time()
 for num in N:
-    r, s = main(num)
+    r, s = main(num, algo)
 
     store_results(num, r, s)
 
