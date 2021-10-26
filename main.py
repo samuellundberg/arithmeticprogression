@@ -147,6 +147,62 @@ def out_greedy(set, m_shape):
     return grid, selected
 
 
+# Greedy algo, selects a grid if possible, but looking from the outsides of the set and working inwards.
+# Differs from out_greedy as it in fact measures distance from centre.
+# However out_greedy performs better on most grids
+def dist_greedy(set, m_shape):
+    grid = np.zeros(m_shape, dtype=int)
+    selected = []
+
+    l = len(set)
+    origin = set[int(l / 2)]
+    dist_list = []
+    for cell in set:
+        x_diff = cell[0] - origin[0]
+        y_diff = cell[1] - origin[1]
+        dist = np.sqrt(x_diff ** 2 + y_diff ** 2)
+        dist_list.append([cell[0], cell[1], dist])
+
+    temp_array = np.array(dist_list)
+    dist_array = temp_array[np.argsort(temp_array[:, 2])]
+    sorted_cells = []
+
+    for i in range(l):
+        tup = (int(dist_array[i, 0]), int(dist_array[i, 1]))
+        sorted_cells.append(tup)
+
+    for y in range(l):
+        select = True
+
+        x = l - y - 1
+        p = sorted_cells[x]
+
+        for p0 in selected:
+            p_0 = p[0]
+            p_1 = p[1]
+            p0_0 = p0[0]
+            p0_1 = p0[1]
+            dist_x = p_0 - p0_0
+            dist_y = p_1 - p0_1
+            if (p_0 + dist_x, p_1 + dist_y) in selected:
+                select = False
+                break
+            elif (p_0 + dist_x, p0_1 - dist_y) in selected:
+                select = False
+                break
+            elif (p0_0 - dist_x, p_1 + dist_y) in selected:
+                select = False
+                break
+            elif (p0_0 - dist_x, p0_1 - dist_y) in selected:
+                select = False
+                break
+        if select:
+            grid[p[0], p[1]] = 1
+            selected.append(p)
+
+    return grid, selected
+
+
 # count the selected cells
 def counter(sets):
     return len(sets)
@@ -223,7 +279,7 @@ def formatter(cells, n, mat):
         s = s + '}'
         l.append(s)
 
-    print('l: ', l)
+    # print('l: ', l)
     return l
 
 
@@ -238,6 +294,8 @@ def main(n, algo):
         grid, cells = in_greedy(s, m_shape)
     elif algo == 'out_greedy':
         grid, cells = out_greedy(s, m_shape)
+    elif algo == 'dist_greedy':
+        grid, cells = dist_greedy(s, m_shape)
     else:
         print(algo, 'is not an available algorithm, exiting.')
         exit()
@@ -251,7 +309,7 @@ def main(n, algo):
     return formatted_cells, score
 
 
-N = [11]
+N = [6]
 # N = [2, 6, 11, 18, 27, 38]
 # N = [2, 6, 11, 18, 27, 38, 50, 65, 81, 98, 118, 139, 162, 187, 214, 242, 273, 305, 338, 374, 411, 450, 491, 534, 578]
 algo = 'out_greedy'
