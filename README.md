@@ -12,8 +12,15 @@ on for the large hexagons. On my laptop it would likely take a few days.
 
 25/10-21
 Now I implemented the greedy algorithm that looks from the middle and out on the hexagonical grid. That was not good
-itself but then I inverted it so it looks from the outside and in. This was a breakthrough. On some grids i find over 10%
-more cells, but fewer on some.
+itself but then I inverted it so it looks from the outside and in (out_greedy). This was a breakthrough. On some grids I
+find over 10% more cells, but fewer on some.
 
 The weakness of this algo is however that it stores the gridpoints as a list and goes from the list out-to-in. It does
 not measure the distance from the middle centre. Which is more in tune with the idea behind the algorithm.
+
+26/10-21
+I implemented measuring distance from center of grid and going inwards on distance (dist_greedy). However this only performed
+better then out_greedy on a few grids, usually worse. As I express the hexagon in a matrix distances are a unsymmetrical
+but I still doubt that it would perform well if I solved that.
+
+NOTE TO SELF: ADD PRINTED GRIDS TO COMPARE ALGORITHMS
