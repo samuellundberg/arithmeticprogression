@@ -130,24 +130,140 @@ def counter(l):
     return len(indexes)
 
 
-num = 27
+# determines whether a set is free of arithmetic progressions
+def is_ap_free(points):
+    for p1 in points:
+        for p2 in points:
+            if p2 <= p1 or (p1 + p2) % 2 == 1:
+                continue
+            mid = p1/2 + p2/2
+
+            if mid in points:
+                return False
+
+    return True
+
+
+# Approximate r(n-a_l)
+def get_rnal(x, l, S):
+    rnal = 1e9
+    if x in S:
+        rnal = S.index(x) + 1
+    elif x < l:
+        for s in S:
+            if x < s:
+                rnal = S.index(s)
+                break
+
+    return rnal
+
+
+# Hard coded values for r(n-a_l)
+def get_rnal_real(n):
+    # r(3n) <= 6 n, for every n > 16.
+    if n < 2:
+        return 1
+    elif n < 4:
+        return 2
+    elif n < 5:
+        return 3
+    elif n < 9:
+        return 4
+    elif n < 11:
+        return 5
+    elif n < 13:
+        return 6
+    elif n < 14:
+        return 7
+    elif n < 20:
+        return 8
+    elif n < 24:
+        return 9
+    elif n < 26:
+        return 10
+    else:
+        return 11
+
+
+# Recursive greedy, backs down if set to small. fails if no set can be found
+# Inspired by Janusz Dybizbanski's Sequences containing no 3-term arithmetic progressions, 2012
+def rec_greedy(n, k):
+    l = 2
+    S = [1, 2]
+    count = 0
+
+    while len(S) > 1 and (len(S) < k or not is_ap_free(S)):
+        count += 1
+        if count == 10000:
+            print('tapout')
+            break
+
+        if is_ap_free(S) and S[-1] < n:
+            S.append(S[-1] + 1)
+            l += 1
+
+        else:
+            # testar att approx r(n-al) till sum(S[:n-al])
+            # rnal = get_rnal(n - S[l - 1], l, S)
+
+            rnal = get_rnal_real(n - S[l - 1])
+
+            # om l är större än 1 och r(n-al) < k-l+1
+            while (l > 1 and rnal < k - l + 1) or S[l-1] > n:
+                l = l - 1
+
+                #rnal = get_rnal(n - S[l - 1], l , S)
+                rnal = get_rnal_real(n - S[l - 1])
+
+            S = S[:l]
+            S[-1] = S[-1] + 1
+
+    if len(S) == k:
+        print('done')
+        return S
+    else:
+        print('fail')
+        return 0
+
+
+num = 9
+
+l = rec_greedy(26, 11);
+
+
+#idx,  = np.where(l == 1)
+#print(idx+1)
+#print(counter(l))
+print(l)
+
+#plt.imshow([l])
+#plt.show()
+
+
 # N = [2, 6, 11]
 # N = [2, 6, 11, 18, 27, 38, 50, 65, 81, 98, 118, 139, 162, 187, 214, 242, 273, 305, 338, 374, 411, 450, 491, 534, 578]
 
 # algo = 'perfect16'
 
-line = side_greedy(num)
-line2 = mid_greedy(num)
+#line = side_greedy(num)
+#line2 = mid_greedy(num)
+#line3 = greedy(num)
 #line3, r = often_greedy(num)
 #line4 = perm_greedy(num)
 
-print('side_greedy = ', counter(line))
+#print('greedy = ', counter(line3))
+
+#print('side_greedy = ', counter(line))
 #print('perm_greedy = ', counter(line4))
 #print('often_greedy = ', counter(line3))
-print('mid_greedy = ', counter(line2))
+#print('mid_greedy = ', counter(line2))
 
-plt.imshow(line.T)
-plt.show()
 
-plt.imshow(line2.T)
-plt.show()
+#plt.imshow(line3.T)
+#plt.show()
+
+#plt.imshow(line.T)
+#plt.show()
+
+#plt.imshow(line2.T)
+#plt.show()
