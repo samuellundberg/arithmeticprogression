@@ -185,12 +185,34 @@ def get_rnal_real(n):
         return 11
 
 
+# storing approximations of r(n) where aprox(r(n)) <= r(n)
+# This is done by storing the longest seen sequence within n
+def update_rn(rn, S):
+    length = len(S)
+    n = S[-1]
+    max_n = len(rn)
+
+    for i in range(max_n - n + 1):
+        if rn[max_n-i] < length:
+            rn[max_n-i] = length
+    return rn
+
+
+# gets the current best estimate of rn for a given n
+def get_rn(rn, n):
+    return rn(n)
+
+
 # Recursive greedy, backs down if set to small. fails if no set can be found
 # Inspired by Janusz Dybizbanski's Sequences containing no 3-term arithmetic progressions, 2012
 def rec_greedy(n, k):
     l = 2
     S = [1, 2]
     count = 0
+
+    n2rn = {}
+    for i in range(n):
+        n2rn[i+1] = 0
 
     while len(S) > 1 and (len(S) < k or not is_ap_free(S)):
         count += 1
@@ -199,6 +221,7 @@ def rec_greedy(n, k):
             break
 
         if is_ap_free(S) and S[-1] < n:
+            n2rn = update_rn(n2rn, S)
             S.append(S[-1] + 1)
             l += 1
 
@@ -220,12 +243,14 @@ def rec_greedy(n, k):
 
     if len(S) == k:
         print('done')
+        print('rn_ests: ')
+        print(n2rn)
         return S
     else:
         print('fail')
         return 0
 
 
-l = rec_greedy(26, 11);
+l = rec_greedy(26, 11)
 
 print(l)
