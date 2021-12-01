@@ -226,44 +226,6 @@ def rec_greedy(n, k):
         return 0
 
 
-num = 9
-
 l = rec_greedy(26, 11);
 
-
-#idx,  = np.where(l == 1)
-#print(idx+1)
-#print(counter(l))
 print(l)
-
-#plt.imshow([l])
-#plt.show()
-
-
-# N = [2, 6, 11]
-# N = [2, 6, 11, 18, 27, 38, 50, 65, 81, 98, 118, 139, 162, 187, 214, 242, 273, 305, 338, 374, 411, 450, 491, 534, 578]
-
-# algo = 'perfect16'
-
-#line = side_greedy(num)
-#line2 = mid_greedy(num)
-#line3 = greedy(num)
-#line3, r = often_greedy(num)
-#line4 = perm_greedy(num)
-
-#print('greedy = ', counter(line3))
-
-#print('side_greedy = ', counter(line))
-#print('perm_greedy = ', counter(line4))
-#print('often_greedy = ', counter(line3))
-#print('mid_greedy = ', counter(line2))
-
-
-#plt.imshow(line3.T)
-#plt.show()
-
-#plt.imshow(line.T)
-#plt.show()
-
-#plt.imshow(line2.T)
-#plt.show()
